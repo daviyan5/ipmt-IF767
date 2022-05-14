@@ -9,10 +9,10 @@ void save_index(int* SA, int* counts, char* index_name, int text_size){
     fclose(index_file);
 }
 void index(Args &ipmt){
-    for(int i = 0; i < ipmt.num_txt; i++){
-        FILE *fp = fopen(ipmt.text_files[i],"r");
+    for(int tn = 0; tn < ipmt.num_txt; tn++){
+        FILE *fp = fopen(ipmt.text_files[tn],"r");
         if(!fp){
-            printf("Error: File %s not found\n",ipmt.text_files[i]);
+            printf("Error: File %s not found\n",ipmt.text_files[tn]);
             continue;
         }
         fseek(fp,0,SEEK_END);
@@ -42,16 +42,16 @@ void index(Args &ipmt){
                 skew_sa(text,SA,size,alpha_size);
                 break;
         }
-        char* index_name = (char*)malloc(sizeof(char)*(strlen(ipmt.text_files[i]) + 5));
-        strcpy(index_name, ipmt.text_files[i]);
-        int pont = strlen(ipmt.text_files[i]) - 1;
+        char* index_name = (char*)malloc(sizeof(char)*(strlen(ipmt.text_files[tn]) + 5));
+        strcpy(index_name, ipmt.text_files[tn]);
+        int pont = strlen(ipmt.text_files[tn]) - 1;
         while(index_name[pont] != '.' and pont > 0){
             pont--;
         }
         if(pont > 0) index_name[pont] = '\0';
         strcat(index_name, ".idx");
         save_index(SA,counts,index_name,size);
-        printf("Index of %s saved in %s\n",ipmt.text_files[i],index_name);
+        printf("Index of %s saved in %s\n",ipmt.text_files[tn],index_name);
         fclose(fp);
         free(text); free(buffer); free(SA); free(counts); free(index_name);
     }

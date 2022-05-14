@@ -46,8 +46,8 @@ int rangedbsearch(char *text, int text_size,char *patt, int patt_size, int* SA, 
 	return ans;
 }
 
-int search(char *text, int text_size,char *patt, int patt_size, int* SA, int *occ, bool only_count){
-    if(!text or !patt or !SA or !occ){
+int sa_search(char *text, int text_size,char *patt, int patt_size, int* SA, int* &occ, bool only_count){
+    if(!text or !patt or !SA){
         return -1;
     }
     // Busca pelo lower e upper bound
