@@ -18,3 +18,6 @@ tests/testfiles/test2.txt
 .vscode/dryrun.log
 .vscode/targets.log
 bin/ipmt
+tests/testfiles/test0.idx
+tests/testfiles/test1.idx
+tests/testfiles/test2.idx

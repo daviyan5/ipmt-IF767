@@ -84,6 +84,7 @@ void search(Args &ipmt){
     vector<int> num_occs;
     int total_occ = 0;
     for(int i = 0; i < ipmt.num_patt; i++){
+        occ[i] = nullptr;
         int num_occ = sa_search(text,text_size,ipmt.patterns[i],ipmt.patt_size[i],SA,occ[i],ipmt.only_count);
         total_occ += num_occ;
         if(ipmt.only_count) printf("%s in %s: %d\n",ipmt.patterns[i],index_name, num_occ);
@@ -98,7 +99,7 @@ void search(Args &ipmt){
     free(text); free(SA); free(counts); free(index_name);
     for(int i = 0; i < ipmt.num_patt; i++){
         free(occ[i]);
-        free(ipmt.patterns[i]);
+        if(ipmt.is_patt_file) free(ipmt.patterns[i]);
     }
     free(occ);
 }
