@@ -22,13 +22,9 @@ tests/testfiles/test0.idx
 tests/testfiles/test1.idx
 tests/testfiles/test2.idx
 bin/test.out
-tests/tests_descriptions.txt
 tests/testfiles/dna50MB.txt
 tests/testfiles/english50MB.txt
 tests/testfiles/patterns.txt
 tests/testfiles/teste.myz
 tests/testfiles/teste.txt
-tests/testfiles/average_time.py
 tests/makefileOld
-tests/makefile
-bin/makefile
