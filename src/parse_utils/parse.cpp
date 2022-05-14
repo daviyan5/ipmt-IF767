@@ -2,16 +2,13 @@
 #include "getopt.h"
 using namespace std;
 
-enum ALGS{
-    ALG_SKEW,
-    ALG_SORT
-};
+const int PATT_MAX_SIZE = 100000;
+
 
 struct option long_options[] = {
 	{"algorithm", required_argument, NULL, 'a'},
     {"count", no_argument, NULL, 'c'},
     {"pattern", required_argument, NULL, 'p'},
-    {"uncompressed", no_argument, NULL, 'u'},
 	{ 0, 0, 0, 0 }
 };
 
@@ -30,7 +27,6 @@ void print_helper(){
     sprintf(f_temp,"ALG pode ser: {%s}\n",op.c_str());
     print_option("",f_temp);
 
-    print_option("-u, --uncompressed","Indexa o arquivo sem compressão.\n");
 
     printf("search options:\n");
     print_option("-c, --count","Apenas conta o número de ocorrências do padrão.\n");
@@ -42,7 +38,6 @@ void init_args(Args& args){
     args.only_count = false;
     args.only_help = false;
     args.is_patt_file = false;
-    args.uncompressed = false;
     args.type = -1;
     args.num_patt = 0;
     args.num_txt = 0;
@@ -50,6 +45,27 @@ void init_args(Args& args){
 }
 int get_alg_id(char* alg){
     return strcmp(alg,"sort") == 0? ALG_SORT : ALG_SKEW;
+}
+void read_patt_file(Args& ipmt){
+    FILE *file;
+    file = fopen(ipmt.patt_file.c_str(), "r");
+    if(!file){
+        printf("Erro ao abrir o arquivo de padrões!\n");
+        exit(1);
+    }
+    char temp[PATT_MAX_SIZE];
+    while(fgets(temp, PATT_MAX_SIZE,file)){ 
+        int len = strlen(temp);
+        if(temp[len - 1] == '\n'){
+            temp[len - 1] = '\0';
+            len -= 1;
+        }
+        char *c = (char*) malloc((len + 1) * sizeof(char));
+        strcpy(c, temp);
+        ipmt.patterns.push_back(c);
+        ipmt.num_patt += 1;
+    }
+    fclose(file);
 }
 Args parse_commands(int argc,char *argv[]){
     Args ipmt; init_args(ipmt);
@@ -62,17 +78,14 @@ Args parse_commands(int argc,char *argv[]){
         strcpy(argv[1],"-z");
         ipmt.type = INDEX;
         int opt;
-        while((opt = getopt_long(argc, argv, "a:uz",long_options,NULL)) != -1){
+        while((opt = getopt_long(argc, argv, "a:z",long_options,NULL)) != -1){
             switch(opt){
                 case 'a':
                     ipmt.alg = get_alg_id(optarg);
-                    if(ipmt.alg != ALG_SORT and ipmt.alg != ALG_SKEW){
+                    if(ipmt.alg != ALG_SORT and ipmt.alg != ALG_SKEW and ipmt.alg != -1){
                         ipmt.failed = true;
                         printf("Algoritmo inválido.\n");
                     }
-                    break;
-                case 'u':
-                    ipmt.uncompressed = true;
                     break;
                 case 'z':
                     break;
@@ -105,25 +118,30 @@ Args parse_commands(int argc,char *argv[]){
                     break;
             }
         }
-        if(optind == argc and !ipmt.is_patt_file){
+        int idx = optind;
+        if(idx == argc and !ipmt.is_patt_file){
             ipmt.failed = true;
             printf("Nenhum padrão foi especificado.\n");
             return ipmt;
         }
         else if(ipmt.is_patt_file){
             read_patt_file(ipmt);
-            return ipmt;
+
         }
-        int idx = optind;
-        ipmt.patterns.push_back(argv[idx]);
-        ipmt.num_patt++;
-        idx++;
+        else{
+            ipmt.patterns.push_back(argv[idx]);
+            ipmt.num_patt++;
+            idx++;
+        }
         if(idx == argc){
             ipmt.failed = true;
             printf("Nenhum arquivo de índice foi especificado.\n");
             return ipmt;
         }
         ipmt.index_file = argv[idx];
+        for(auto &u:ipmt.patterns){
+            ipmt.patt_size.push_back(strlen(u));
+        }
     }
     else if(strcmp(argv[1],"zip") == 0){
         strcpy(argv[1],"-z");
@@ -156,7 +174,4 @@ Args parse_commands(int argc,char *argv[]){
         printf("Opção '%s' inválida. Tente ./ipmt help.\n",argv[1]);
     }
     return ipmt;
-}
-int main(int argc,char *argv[]){
-    Args ipmt = parse_commands(argc,argv);
 }

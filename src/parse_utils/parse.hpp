@@ -4,7 +4,7 @@
 
 #include <bits/stdc++.h>
 #include <iostream>
-using namespace std;
+const int alpha_size = 128;
 
 enum TYPES{
     INDEX,
@@ -13,13 +13,18 @@ enum TYPES{
     UNZIP
 };
 
+enum ALGS{
+    ALG_SKEW,
+    ALG_SORT
+};
+
 // Argumentos da CLI
 struct Args{
 
     bool only_count;                    // Apenas conta as ocorrências
     bool only_help;                     // Apenas ajuda
     bool is_patt_file;                  // O padrão foi dado por um arquivo
-    bool uncompressed;                  // O arquivo deve ser salvo descompactado
+    
     bool failed;                        // Deu ruim
 
     int type;                           // Tipo de comando
@@ -27,12 +32,13 @@ struct Args{
     int num_txt;                        // Número de textos
     int alg;                            // Algoritimo usado
 
-    string index_file;                  // Endereço do índice
-    string zipped_file;                 // Endereço do compactado   
-    string patt_file;                   // Endereço do arquivo de padrões
+    std::string index_file;                  // Endereço do índice
+    std::string zipped_file;                 // Endereço do compactado   
+    std::string patt_file;                   // Endereço do arquivo de padrões
     std::vector<char*> patterns;        // Array de padrões
     std::vector<char*> text_files;      // Endereços dos arquivos de texto
     std::vector<int> patt_size;         // Tamanho de cada padrão, para evitar uso exaustivo de strlen()
+    std::vector<long> texts_sizes;      // Tamanho de cada texto
 };
 
 Args parse_commands(int argc,char *argv[]);

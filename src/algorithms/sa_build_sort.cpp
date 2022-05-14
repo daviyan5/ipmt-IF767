@@ -1,9 +1,8 @@
 #include "suffix_array.hpp"
 using namespace std;
 
-void count_sort(int v[][3], int aux[][3], int text_size, int i, int alpha_size, int offset){
-	int count[alpha_size + 2]; 
-	memset(count, 0, sizeof(count));
+void count_sort(int **v, int **aux,int *count, int text_size, int i, int alpha_size, int offset){
+	memset(count,0,sizeof(int) * (alpha_size+offset));
 	for(int j = 0; j < text_size; j++){
 		count[v[j][i] + offset]++;
 	}
@@ -22,10 +21,9 @@ void count_sort(int v[][3], int aux[][3], int text_size, int i, int alpha_size, 
 		v[j][2] = aux[j][2];
 	}
 }
-void radix_sort(int v[][3], int text_size, int m, int alpha_size){
-    int aux[text_size][3];
-    for(int i = m-1; i >= 0; i--){
-        count_sort(v, aux, text_size, i, alpha_size, i == 1? 1: 0);
+void radix_sort(int **v,int **aux,int *count, int text_size, int m, int alpha_size){
+	for(int i = m-1; i >= 0; i--){
+        count_sort(v, aux, count, text_size, i, alpha_size, i == 1? 1: 0);
     }
 }
 
@@ -41,14 +39,22 @@ void sort_sa(int* text, int* SA, int text_size, int alpha_size){
 	for(int i = 0; i < text_size; i++){
 		P[i] = text[i];
 	}
-	int pairs[text_size][3];
+
+	int **pairs = (int**) malloc((text_size+1) * sizeof(int*));
+	int **aux = (int**) malloc((text_size+1) * sizeof(int*));
+	int *count = (int*) calloc(sz + 2,sizeof(int));
+
+	for(int i = 0; i < text_size; i++){
+		pairs[i] = (int*) malloc(3 * sizeof(int));
+		aux[i] = (int*) malloc(3 * sizeof(int));
+	}
 	for(int pont = 1, l = 1; l >> 1 <= text_size; pont++, l <<= 1){
 		for(int i = 0; i < text_size; i++){
 			pairs[i][0] = P[i];
 			pairs[i][1] = i+l < text_size? P[i+l]: -1;
 			pairs[i][2] = i;
 		}
-        radix_sort(pairs, text_size, 2, sz);
+        radix_sort(pairs,aux,count, text_size, 2, sz);
 		int order = 0;
 		memset(P, 0, sizeof(int) * sz);
 		for(int i = 1; i < text_size; i++){
@@ -57,6 +63,7 @@ void sort_sa(int* text, int* SA, int text_size, int alpha_size){
 	}
 	for(int i = 0; i < text_size; i++){
 		SA[P[i]] = i;
+		free(pairs[i]); free(aux[i]);
 	}
-	free(P);
+	free(P); free(count); free(pairs); free(aux);
 }
