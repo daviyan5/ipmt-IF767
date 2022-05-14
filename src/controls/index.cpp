@@ -8,6 +8,7 @@ void save_index(int* SA, int* counts, char* index_name, int text_size){
     fwrite(SA, sizeof(int), text_size, index_file);
     fclose(index_file);
 }
+
 void index(Args &ipmt){
     for(int tn = 0; tn < ipmt.num_txt; tn++){
         FILE *fp = fopen(ipmt.text_files[tn],"r");

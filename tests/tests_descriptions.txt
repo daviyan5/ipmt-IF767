@@ -1,45 +1,17 @@
 
-- Single Pattern - Exact
-T1
-Single Short Pattern
-Multiple Sizes
-Show Thread Difference
+INDEX Tests
+T1.1 - Different DNA File Size Time
+T1.2 - Different ENG File Size Time
+T1.3 - Different DNA File Size Index Size
 
-T2
-Single Medium Pattern
-Multiple Sizes
-Show Thread Difference
+SEARCH Tests
+T2.1 - Same Single Pattern, Different DNA File Size vs Grep
+T2.2 - Same Single Pattern, Different ENG File Size vs Grep
+T3.1 - Multiple Pattern Size, Same DNA File vs Grep
+T3.2 - Multiple Pattern Size, Same ENG File vs Grep
+T3.1 - Multiple Pattern, Same DNA File vs Grep
+T3.2 - Multiple Pattern, Same ENG File vs Grep
 
-T3
-Single Long Pattern
-Multiple Sizes
-Show Thread Difference
+ZIP Tests
 
-- Single Pattern - Aproximate
-
-T4
-Single Short Pattern
-Single File (50MB)
-Multiple Distances
-
-T5
-Single Medium Pattern
-Single File (50MB)
-Multiple Distances
-
-T6
-Single Long Pattern
-Single File (50MB)
-Multiple Distances
-
-- Multiple Pattern 
-
-T7
-Random Patterns
-All Files Sizes
-Show Thread Difference
-
-T8
-Multiples Nº Patterns
-1 5 25 125 250 500
-Single File (50MB)
+UNZIP Tests

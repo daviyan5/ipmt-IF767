@@ -18,7 +18,7 @@ void print_option(const char command[],const char description[]){
 void print_helper(){
     printf("IPMT: Indexação, Busca, Compressão e Descompressão.\n");
     printf("types: index, search, zip, unzip, help\n");
-    printf("usage: ./ipmt type\n\n");
+    printf("usage: ./ipmt type [options]\n\n");
     
     printf("index options:\n");
     print_option("-a, --algorithm ALG:","Especifica o algoritmo que deve ser utilizado para o array de sufixos.");
@@ -144,6 +144,7 @@ Args parse_commands(int argc,char *argv[]){
         }
     }
     else if(strcmp(argv[1],"zip") == 0){
+    
         strcpy(argv[1],"-z");
         ipmt.type = ZIP;
         if(argc == 2){
@@ -151,7 +152,7 @@ Args parse_commands(int argc,char *argv[]){
             printf("Nenhum arquivo de texto foi especificado.\n");
             return ipmt;
         }
-        for(int idx = 3; idx < argc; idx++){
+        for(int idx = 2; idx < argc; idx++){
             ipmt.text_files.push_back(argv[idx]);
             ipmt.num_txt++;
         }
@@ -164,7 +165,7 @@ Args parse_commands(int argc,char *argv[]){
             printf("Nenhum arquivo foi especificado.\n");
             return ipmt;
         }
-        for(int idx = 3; idx < argc; idx++){
+        for(int idx = 2; idx < argc; idx++){
             ipmt.text_files.push_back(argv[idx]);
             ipmt.num_txt++;
         }
