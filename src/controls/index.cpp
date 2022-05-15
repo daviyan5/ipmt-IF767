@@ -1,10 +1,12 @@
 #include "index.hpp"
 
-void save_index(int* SA, int* counts, char* index_name, int text_size){
+void save_index(int* SA, int* counts, char* index_name,char* text, int text_size, int save_text){
     
     FILE* index_file = fopen(index_name, "wb");
     fwrite(&text_size, sizeof(int), 1, index_file);
-    fwrite(counts, sizeof(int), alpha_size, index_file);
+    fwrite(&save_text, sizeof(int), 1, index_file);
+    if(save_text == 1) fwrite(text,sizeof(char),text_size,index_file);
+    else fwrite(counts, sizeof(int), alpha_size, index_file);
     fwrite(SA, sizeof(int), text_size, index_file);
     fclose(index_file);
 }
@@ -28,8 +30,10 @@ void index(Args &ipmt){
         }
         text[size] = text[size+1] = text[size+2] = 0;
         int *counts = (int*) calloc(alpha_size,sizeof(int));
-        for(int i = 0; i < size; i++){
-            counts[text[i]] += 1;
+        if(!ipmt.save_text){
+            for(int i = 0; i < size; i++){
+                counts[text[i]] += 1;
+            }
         }
         int *SA = (int*) malloc(size * sizeof(int));
         switch(ipmt.alg){
@@ -51,7 +55,7 @@ void index(Args &ipmt){
         }
         if(pont > 0) index_name[pont] = '\0';
         strcat(index_name, ".idx");
-        save_index(SA,counts,index_name,size);
+        save_index(SA,counts,index_name, buffer, size,ipmt.save_text);
         printf("Index of %s saved in %s\n",ipmt.text_files[tn],index_name);
         fclose(fp);
         free(text); free(buffer); free(SA); free(counts); free(index_name);

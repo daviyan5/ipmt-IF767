@@ -6,3 +6,11 @@ help:
 	@echo "Para executar os testes, use "make Ti", onde i é o número do teste.";
 	@echo "Além das dependências de execução do comando (GCC), para executar os testes também é necessário python."
 	@echo "Os resultados de cada teste ficarão na pasta ./results";
+
+T1:
+
+T2:
+
+T3:
+
+T4:

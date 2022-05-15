@@ -9,8 +9,8 @@ T2.1 - Same Single Pattern, Different DNA File Size vs Grep
 T2.2 - Same Single Pattern, Different ENG File Size vs Grep
 T3.1 - Multiple Pattern Size, Same DNA File vs Grep
 T3.2 - Multiple Pattern Size, Same ENG File vs Grep
-T3.1 - Multiple Pattern, Same DNA File vs Grep
-T3.2 - Multiple Pattern, Same ENG File vs Grep
+T4.1 - Multiple Pattern, Same DNA File vs Grep
+T4.2 - Multiple Pattern, Same ENG File vs Grep
 
 ZIP Tests
 

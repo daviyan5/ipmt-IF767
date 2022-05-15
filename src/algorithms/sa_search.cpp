@@ -52,7 +52,16 @@ int sa_search(char *text, int text_size,char *patt, int patt_size, int* SA, int*
     }
     // Busca pelo lower e upper bound
 	int lower = rangedbsearch(text, text_size, patt, patt_size, SA, true);
+	if(lower > 0 and text[SA[lower]] != patt[0]){
+		printf("lower bound error\n");
+		return -1;
+	}
 	int upper = rangedbsearch(text, text_size, patt, patt_size, SA, false);
+	if(upper > 0 and text[SA[upper]] != patt[0]){
+		printf("upper bound error\n");
+		return -1;
+	}
+	if(upper == lower and lower == 0) return 0;
 	if(only_count) return upper - lower + 1;
     else{
         int num = (upper - lower + 1);

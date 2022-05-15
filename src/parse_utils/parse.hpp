@@ -28,6 +28,7 @@ struct Args{
     bool failed;                        // Deu ruim
 
     int type;                           // Tipo de comando
+    int save_text;                      // Salvar o texto
     int num_patt;                       // Número de padrões
     int num_txt;                        // Número de textos
     int alg;                            // Algoritimo usado

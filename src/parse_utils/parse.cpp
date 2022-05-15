@@ -9,6 +9,7 @@ struct option long_options[] = {
 	{"algorithm", required_argument, NULL, 'a'},
     {"count", no_argument, NULL, 'c'},
     {"pattern", required_argument, NULL, 'p'},
+    {"save", no_argument, NULL, 's'},
 	{ 0, 0, 0, 0 }
 };
 
@@ -21,12 +22,16 @@ void print_helper(){
     printf("usage: ./ipmt type [options]\n\n");
     
     printf("index options:\n");
-    print_option("-a, --algorithm ALG:","Especifica o algoritmo que deve ser utilizado para o array de sufixos.");
+    print_option("-a, --algorithm ALG:","Especifica o algoritmo");
+    print_option("","que deve ser utilizado para o array de sufixos.");
+
     string op = "skew, sort";
     char f_temp[500];
     sprintf(f_temp,"ALG pode ser: {%s}\n",op.c_str());
     print_option("",f_temp);
-
+    print_option("-s, --save:","Salva o texto no arquivo de index.");
+    print_option("","Essa opção diminui consideravelmente o tempo de busca,");
+    print_option("","mas pode aumentar o tamanho do arquivo de índice.");
 
     printf("search options:\n");
     print_option("-c, --count","Apenas conta o número de ocorrências do padrão.\n");
@@ -39,6 +44,7 @@ void init_args(Args& args){
     args.only_help = false;
     args.is_patt_file = false;
     args.type = -1;
+    args.save_text = 0;
     args.num_patt = 0;
     args.num_txt = 0;
     args.alg = -1;
@@ -78,7 +84,7 @@ Args parse_commands(int argc,char *argv[]){
         strcpy(argv[1],"-z");
         ipmt.type = INDEX;
         int opt;
-        while((opt = getopt_long(argc, argv, "a:z",long_options,NULL)) != -1){
+        while((opt = getopt_long(argc, argv, "a:zs",long_options,NULL)) != -1){
             switch(opt){
                 case 'a':
                     ipmt.alg = get_alg_id(optarg);
@@ -86,6 +92,9 @@ Args parse_commands(int argc,char *argv[]){
                         ipmt.failed = true;
                         printf("Algoritmo inválido.\n");
                     }
+                    break;
+                case 's':
+                    ipmt.save_text = 1;
                     break;
                 case 'z':
                     break;
