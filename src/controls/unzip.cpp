@@ -1,25 +1,29 @@
 #include "unzip.hpp"
 using namespace std;
 
-void load_zip(char* zip_name, char* &buffer, int &text_size){
-    FILE* zip_file = fopen(zip_name, "rb");
-    if(!zip_file){
+vector<char> load_zip(char* zip_name){
+    ifstream zip_file(zip_name);
+    vector<char> txt((istreambuf_iterator<char>(zip_file)), istreambuf_iterator<char>());
+    //for(auto c: txt) cout << c;
+    //FILE* zip_file = fopen(zip_name, "rb");
+    if(!zip_file.is_open()){
         printf("Zip file '%s' not found.\n",zip_name);
         exit(1);
     }
-
-    int ert = fread(&text_size, sizeof(int), 1, zip_file);
-    buffer = (char*) malloc(text_size * sizeof(char));
-    int ers = fread(buffer, sizeof(char), text_size, zip_file);
-    if(ert != 1 or ers != text_size){
-        printf("Error reading zip file '%s'.\n", zip_name);
-        exit(1);
-    }
-    fclose(zip_file);
+    zip_file.close();
+    return txt;
+    // int ert = fread(&text_size, sizeof(int), 1, zip_file);
+    // buffer = (char*) malloc(text_size * sizeof(char));
+    // int ers = fread(buffer, sizeof(char), text_size, zip_file);
+    // if(ert != 1 or ers != text_size){
+    //     printf("Error reading zip file '%s'.\n", zip_name);
+    //     exit(1);
+    // }
+    // fclose(zip_file);
 }
 
 void save_txt(char* txt_name, vector<char> &decoded, int size){
-    FILE* txt_file = fopen(txt_name, "w");
+    FILE* txt_file = fopen(txt_name, "wt");
     if(!txt_file){
         printf("Unable to create text file \n");
         exit(1);
@@ -32,10 +36,8 @@ void save_txt(char* txt_name, vector<char> &decoded, int size){
 
 void unzip(Args &ipmt){
     for(int tn = 0; tn < ipmt.num_txt; tn++){
-        char *txt;
-        int text_size;
-        load_zip(ipmt.text_files[tn], txt, text_size);
-        vector<char> decoded = decode(txt, text_size);
+        vector<char> txt = load_zip(ipmt.text_files[tn]);
+        vector<char> decoded = decode(txt, txt.size());
 
         char* text_name = (char*)malloc(sizeof(char)*(strlen(ipmt.text_files[tn]) + 5));
         strcpy(text_name, ipmt.text_files[tn]);

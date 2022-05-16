@@ -49,3 +49,7 @@ tests/testfiles/split_txt.cpp
 tests/testfiles/dna.txt
 bin/search.out
 bin/index.out
+tests/testfiles/testezip.myz
+tests/testfiles/testezip.txt
+tests/testfiles/dna/patternsDNA.txt
+tests/testfiles/english/patternsENG.txt

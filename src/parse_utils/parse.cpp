@@ -10,6 +10,7 @@ struct option long_options[] = {
     {"count", no_argument, NULL, 'c'},
     {"pattern", required_argument, NULL, 'p'},
     {"save", no_argument, NULL, 's'},
+    {"per-pattern", no_argument, NULL, 'P'},
 	{ 0, 0, 0, 0 }
 };
 
@@ -36,6 +37,7 @@ void print_helper(){
     printf("search options:\n");
     print_option("-c, --count","Apenas conta o número de ocorrências do padrão.\n");
     print_option("-p, --pattern PATTERNFILE","Arquivo de padrões a serem buscados.\n");
+    print_option("-e, --per-pattern","Imprime o número de ocorrências por padrão.\n");
 
 }
 void init_args(Args& args){
@@ -43,6 +45,7 @@ void init_args(Args& args){
     args.only_count = false;
     args.only_help = false;
     args.is_patt_file = false;
+    args.per_pattern = false;
     args.type = -1;
     args.save_text = 0;
     args.num_patt = 0;
@@ -114,7 +117,7 @@ Args parse_commands(int argc,char *argv[]){
         strcpy(argv[1],"-z");
         ipmt.type = SEARCH;
         int opt;
-        while((opt = getopt_long(argc, argv, "p:cz",long_options,NULL)) != -1){
+        while((opt = getopt_long(argc, argv, "p:cze",long_options,NULL)) != -1){
             switch(opt){
                 case 'c':
                     ipmt.only_count = true;
@@ -122,6 +125,9 @@ Args parse_commands(int argc,char *argv[]){
                 case 'p':
                     ipmt.is_patt_file = true;
                     ipmt.patt_file = optarg;
+                    break;
+                case 'e':
+                    ipmt.per_pattern = true;
                     break;
                 case 'z':
                     break;

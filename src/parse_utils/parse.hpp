@@ -24,7 +24,7 @@ struct Args{
     bool only_count;                    // Apenas conta as ocorrências
     bool only_help;                     // Apenas ajuda
     bool is_patt_file;                  // O padrão foi dado por um arquivo
-    
+    bool per_pattern;                   // Printa o número de ocorrências por padrão
     bool failed;                        // Deu ruim
 
     int type;                           // Tipo de comando

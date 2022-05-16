@@ -63,6 +63,7 @@ void print_occ_mul(char *text, int total_occ, int text_size, int num_patt, int *
     blue();
     printf("-----Total de Ocorrências: %d-----\n",total_occ);
     default_colour();
+    if(total_occ == 0) return;
     bool *paint = (bool*) calloc(text_size,sizeof(bool));
     int lim = 0;
     for(int j = 0; j < num_patt; j++){
@@ -95,6 +96,7 @@ int compare_int(const void *a, const void *b){
     return *(int*)a - *(int*)b;
 }
 void search(Args &ipmt){
+    auto start = chrono::high_resolution_clock::now();
     int text_size = 0;
     int *SA, *counts = (int*) calloc(alpha_size,sizeof(int));
     char *index_name = (char*)malloc(sizeof(char)*(ipmt.index_file.size() + 5));
@@ -108,6 +110,9 @@ void search(Args &ipmt){
     int **occ = (int**) malloc(ipmt.num_patt * sizeof(int*));
     vector<int> num_occs;
     int total_occ = 0;
+    auto end = chrono::high_resolution_clock::now();
+    int dur = chrono::duration_cast<chrono::milliseconds>(end-start).count();
+    printf("\n-----Index loaded in %d ms-----\n",dur);
     for(int i = 0; i < ipmt.num_patt; i++){
         occ[i] = nullptr;
         int num_occ = sa_search(text,text_size,ipmt.patterns[i],ipmt.patt_size[i],SA,occ[i],ipmt.only_count);
@@ -116,12 +121,13 @@ void search(Args &ipmt){
             continue;
         }
         total_occ += num_occ;
-        printf("%s in %s: %d\n",ipmt.patterns[i],index_name, num_occ);
+        if(ipmt.per_pattern) printf("%s in %s: %d\n",ipmt.patterns[i],index_name, num_occ);
         if(!ipmt.only_count){
             qsort(occ[i],num_occ,sizeof(int),compare_int);
             num_occs.push_back(num_occ);
         }
     }
+    if(!ipmt.per_pattern) printf("%s in %s: %d\n",ipmt.patt_file.c_str(), index_name, total_occ);
     if(!ipmt.only_count){
         print_occ_mul(text,total_occ,text_size,ipmt.num_patt,occ,ipmt.patt_size,num_occs);
     }

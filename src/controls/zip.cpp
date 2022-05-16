@@ -2,12 +2,14 @@
 using namespace std;
 
 void save_zip(vector<char> &encoded, int size, char *zip_name){
-    FILE* index_file = fopen(zip_name, "wb");
-    fwrite(&size, sizeof(int), 1, index_file);
+    for(auto &u:encoded) cout << u;
+    cout << endl;
+    ofstream zip_file(zip_name, ios::binary);
     for(int i = 0; i < size; i++){
-        fwrite(&encoded[i], sizeof(char), 1, index_file);
+        zip_file.write(&encoded[i], 1);
     }
-    fclose(index_file);
+    //zip_file.write(&encoded[0], size);
+    zip_file.close();
 }
 
 void zip(Args &ipmt){
