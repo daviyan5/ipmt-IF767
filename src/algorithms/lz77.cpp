@@ -52,15 +52,7 @@ void prefix_match(string txt, string pat, int &p, int &l){    // n = len(txt), m
     }
 }
 
-char convert_first(int p){
-    return (char) (p >> 4);
-}
-
-char convert_second(int p, int l){
-    return (char) (((0x000F & p) << 4) | l);
-}
-
-vector<char> encode(char *txt, int sz){
+void encode(char *txt, int sz, char *zip_name){
     int idx = 0;
     string searchBuffer, lookAheadBuffer;
     searchBuffer.assign(bufferSize, ' ');
@@ -72,44 +64,37 @@ vector<char> encode(char *txt, int sz){
         idx++;
     }
 
-    vector<char> encoded;
+    for(int i = 0; i < lookAheadBufferSize; i++){
+        if(idx >= sz) break;
+        lookAheadBuffer += txt[i];
+        idx++;
+    }
 
-    while(m > 0 && idx < sz){
+    ofstream file;
+    file.open(zip_name);
+
+    while(idx < sz){
         int p = 0, l = 0;
         prefix_match(searchBuffer, lookAheadBuffer, p, l);
         char c = lookAheadBuffer[l];
     
-        // char first = convert_first(p);
-        // char second = convert_second(p, l);
-
-        char first = (reinterpret_cast<const char *>(&p), sizeof(p));
-        char second = (reinterpret_cast<const char *>(&l), sizeof(l));
-
-        // cout << first << ' ' << second << ' ' << c << '\n';
-
-        encoded.push_back(first);
-        encoded.push_back(second);
-        encoded.push_back(c);
+        file.write(reinterpret_cast<const char *>(&p), sizeof(p));
+        file.write(reinterpret_cast<const char *>(&l), sizeof(l));
+        file.write(reinterpret_cast<const char *>(&c), sizeof(c));
 
         int sbsize = searchBuffer.length();
         int lasize = lookAheadBuffer.length();
 
         string aux = "";
-        for(int i = 0; i + l + 1 < sbsize; i++){
-            aux += searchBuffer[i + l + 1];
-        }
-
+        for(int i = l + 1; i < sbsize; i++) aux += searchBuffer[i];
+        
+        for(int i = 0; i < l + 1; i++) aux += lookAheadBuffer[i];
+        
         searchBuffer = aux;
 
-        for(int i = 0; i + l + 1 < lasize; i++){
-            searchBuffer += lookAheadBuffer[i + l + 1];
-        }
-
         aux = "";
-        for(int i = 0; i + l + 1 < lasize; i++){
-            aux += lookAheadBuffer[i + l + 1];
-        }
-
+        for(int i = l + 1; i < lasize; i++) aux += lookAheadBuffer[i];
+        
         lookAheadBuffer = aux;
         for(int i = 0; i < l + 1; i++){
             if(idx < sz){
@@ -118,39 +103,33 @@ vector<char> encode(char *txt, int sz){
             }
             else break;
         }
-
-        m = lookAheadBuffer.length();
     }
-
-    return encoded;
 }
 
-int decodeC(int pos, int first, int second){
-    return pos - (((unsigned char) first << 4) | ((unsigned char) second >> 4));
-}
+void decode(char *zip_name, string &txt){
+    ifstream file;
+    file.open(zip_name, ios::binary);
 
-int decodeSize(int x){
-    return (x & 0x000F);
-}
+    string sbuf, prefix = "";
+    sbuf.assign(bufferSize, ' ');
 
-vector<char> decode(vector<char> &encoded, int sz){
-    vector<char> decoded;
-    int pos = 0;
-    for(int i = 0; i < sz; i += 3){
-        int first = (unsigned char) encoded[i];
-        int second = (unsigned char) encoded[i + 1];
+    while(!file.eof()){
+        char toReadC;
+        int toReadP, toReadL;
 
-        int size = decodeSize(second);
-        int start = decodeC(pos, first, second);
-        int end = start + size;
+        file.read(reinterpret_cast<char *>(&toReadP), sizeof(toReadP));
+        file.read(reinterpret_cast<char *>(&toReadL), sizeof(toReadL));
+        file.read(reinterpret_cast<char *>(&toReadC), sizeof(toReadC));
 
-        for(int j = start; j < end; j++){
-            decoded.push_back(decoded[j]);
-        }
-        
-        decoded.push_back(encoded[i + 2]);
-        pos += size + 1;
+        prefix = "";
+        for(int i = toReadP, j = toReadL; i < bufferSize && j > 0; i++, j--) prefix += sbuf[i];
+
+        txt += prefix + toReadC;
+
+        string aux = "";
+        for(int i = toReadL + 1; i < sbuf.length(); i++) aux += sbuf[i];
+        aux += prefix + toReadC;
+
+        sbuf = aux;
     }
- 
-    return decoded;
 }
