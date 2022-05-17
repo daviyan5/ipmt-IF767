@@ -8,7 +8,9 @@ typedef tuple<int, int, char> iic;
 const int ALF_SIZE = 128;
 
 int bufferBits = 12;
+int bufferBytes = ceil(bufferBits / 8.0);
 int lookAheadBits = 4;
+int lookAheadBytes = ceil(lookAheadBits / 8.0);
 int bufferSize = (1 << bufferBits);
 int lookAheadBufferSize = (1 << lookAheadBits);
 
@@ -31,9 +33,9 @@ void build_fsm(string pat, int m, map<pair<int, char>, int>& fsm){
     }
 }
  
-void prefix_match(string txt, string pat, int &p, int &l){    // n = len(txt), m = len(pat)
+void prefix_match(string &txt, string &pat, int &p, int &l){    // n = len(txt), m = len(pat)
     int n = txt.length();
-    int m = pat.length();
+    int m = pat.length() - 1;
 
     map<pair<int, char>, int> fsm;
     build_fsm(pat, m, fsm);
@@ -53,49 +55,37 @@ void prefix_match(string txt, string pat, int &p, int &l){    // n = len(txt), m
 }
 
 void encode(char *txt, int sz, char *zip_name){
-    int idx = 0;
-    string searchBuffer, lookAheadBuffer;
-    searchBuffer.assign(bufferSize, ' ');
+    int idx = 0, m = 0;
+    string searchBuffer(' ',bufferSize), lookAheadBuffer;
 
-    int m = min(lookAheadBufferSize, sz);
-
-    for(int i = 0; i < m; i++){
+    for(int i = 0; i < lookAheadBufferSize; i++){
+        if(idx >= sz) break;
         lookAheadBuffer += txt[idx];
         idx++;
     }
 
-    for(int i = 0; i < lookAheadBufferSize; i++){
-        if(idx >= sz) break;
-        lookAheadBuffer += txt[i];
-        idx++;
-    }
+    m = lookAheadBuffer.length();
 
     ofstream file;
     file.open(zip_name);
 
-    while(idx < sz){
+    while(m > 0){
         int p = 0, l = 0;
         prefix_match(searchBuffer, lookAheadBuffer, p, l);
         char c = lookAheadBuffer[l];
     
-        file.write(reinterpret_cast<const char *>(&p), sizeof(p));
-        file.write(reinterpret_cast<const char *>(&l), sizeof(l));
-        file.write(reinterpret_cast<const char *>(&c), sizeof(c));
+        file.write(reinterpret_cast<const char *>(&p), bufferBytes);
+        file.write(reinterpret_cast<const char *>(&l), lookAheadBytes);
+        file.write(reinterpret_cast<const char *>(&c), 1);
 
         int sbsize = searchBuffer.length();
         int lasize = lookAheadBuffer.length();
+        for (int i = l + 1; i < sbsize; i++){
+            searchBuffer[i - l - 1] = searchBuffer[i];
+            searchBuffer[i] = lookAheadBuffer[i - l - 1];
+        }
+        lookAheadBuffer = lookAheadBuffer.substr(l+1, lasize - l - 1);
 
-        string aux = "";
-        for(int i = l + 1; i < sbsize; i++) aux += searchBuffer[i];
-        
-        for(int i = 0; i < l + 1; i++) aux += lookAheadBuffer[i];
-        
-        searchBuffer = aux;
-
-        aux = "";
-        for(int i = l + 1; i < lasize; i++) aux += lookAheadBuffer[i];
-        
-        lookAheadBuffer = aux;
         for(int i = 0; i < l + 1; i++){
             if(idx < sz){
                 lookAheadBuffer += txt[idx];
@@ -103,33 +93,38 @@ void encode(char *txt, int sz, char *zip_name){
             }
             else break;
         }
+
+        m = lookAheadBuffer.length();
     }
+    file.close();
 }
 
 void decode(char *zip_name, string &txt){
     ifstream file;
     file.open(zip_name, ios::binary);
 
-    string sbuf, prefix = "";
+    string sbuf = "", prefix = "";
     sbuf.assign(bufferSize, ' ');
 
     while(!file.eof()){
-        char toReadC;
-        int toReadP, toReadL;
+        char c = 0;
+        int p = 0, l = 0;
 
-        file.read(reinterpret_cast<char *>(&toReadP), sizeof(toReadP));
-        file.read(reinterpret_cast<char *>(&toReadL), sizeof(toReadL));
-        file.read(reinterpret_cast<char *>(&toReadC), sizeof(toReadC));
+        file.read(reinterpret_cast<char *>(&p), bufferBytes);
+        file.read(reinterpret_cast<char *>(&l), lookAheadBytes);
+        file.read(reinterpret_cast<char *>(&c), 1);
 
         prefix = "";
-        for(int i = toReadP, j = toReadL; i < bufferSize && j > 0; i++, j--) prefix += sbuf[i];
+        for(int i = p, j = l; i < bufferSize && j > 0; i++, j--) prefix += sbuf[i];
 
-        txt += prefix + toReadC;
+        txt += prefix + c;
 
         string aux = "";
-        for(int i = toReadL + 1; i < sbuf.length(); i++) aux += sbuf[i];
-        aux += prefix + toReadC;
+        for(int i = l + 1; i < sbuf.length(); i++) aux += sbuf[i];
+        aux += prefix + c;
 
         sbuf = aux;
     }
+
+    file.close();
 }

@@ -12,10 +12,9 @@ void zip(Args &ipmt){
         int size = ftell(fp);   // tamanho do texto
         fseek(fp, 0, SEEK_SET);
         char *buffer = (char*) malloc((size + 3) * sizeof(char)); //texto
-        ipmt.texts_sizes.push_back(size);
-        int er = fread(buffer, 1, size, fp);
-        fclose(fp);
 
+        int er = fread(buffer, sizeof(char), size, fp);
+        fclose(fp);
         char* zip_name = (char*)malloc(sizeof(char)*(strlen(ipmt.text_files[tn]) + 5));
         strcpy(zip_name, ipmt.text_files[tn]);
         int pont = strlen(ipmt.text_files[tn]) - 1;
@@ -27,6 +26,8 @@ void zip(Args &ipmt){
         
         //Encodar 
         encode(buffer, size, zip_name);
-        printf("Saiu do encode\n");
+        printf("Arquivo %s zipado.\n", ipmt.text_files[tn]);
+        free(buffer);
+        free(zip_name);
     }
 }

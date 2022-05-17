@@ -1,8 +1,8 @@
 
 INDEX Tests
-T1.1 - Different DNA File Size Time
-T1.2 - Different ENG File Size Time
-T1.3 - Different DNA File Size Index Size
+T1.1 - Different DNA File Size Times (With Text, Without Text)
+T1.2 - Different ENG File Size Times (With Text, Without Text)
+T1.3 - Different DNA File Size Index Size (With Text, Without Text)
 
 SEARCH Tests
 T2.1 - Same Single Pattern, Different DNA File Size vs Grep

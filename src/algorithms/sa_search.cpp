@@ -25,12 +25,13 @@ int rangedbsearch(char *text, int text_size,char *patt, int patt_size, int* SA, 
 			if(lower){                                  // Se a busca for pelo lower-bound
 				if(mid == right) break;
 				right = mid;
+				lcpr = i;
 			}
 			else{                                       // Se a busca for pelo upper-bound
 				if(mid == left) break;
 				left = mid;
+				lcpl = i;
 			}
-			lcpl = lcpr = 0;
 		}
 		else if(less){
 			if(mid == right) break;

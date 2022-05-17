@@ -3,6 +3,7 @@
 #define _HAVE_LZ77_H
 
 #include <bits/stdc++.h>
+using namespace std;
 
 void encode(char *txt, int sz, char *zip_name);
 void decode(char *zip_name, string &txt);
