@@ -14,7 +14,7 @@ int lookAheadBytes = ceil(lookAheadBits / 8.0);
 int bufferSize = (1 << bufferBits);
 int lookAheadBufferSize = (1 << lookAheadBits);
 
-void build_fsm(string pat, int m, map<pair<int, char>, int>& fsm){
+void build_fsm(string &pat, int m, map<pair<int, char>, int>& fsm){
     for(int i = 0; i < ALF_SIZE; i++) fsm[ic(0, i)] = 0;
     
     fsm[ic(0, pat[0])] = 1;
