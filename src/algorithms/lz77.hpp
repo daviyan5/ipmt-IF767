@@ -4,7 +4,7 @@
 
 #include <bits/stdc++.h>
 
-std::vector<char> encode(char *txt, int sz);
-std::vector<char> decode(std::vector<char> &encoded, int sz);
+void encode(char *txt, int sz, char *zip_name);
+void decode(char *zip_name, string &txt);
 
 #endif
