@@ -14,7 +14,7 @@ enum TYPES{
 };
 
 enum ALGS{
-    ALG_SKEW,
+    ALG_DC3,
     ALG_SORT
 };
 

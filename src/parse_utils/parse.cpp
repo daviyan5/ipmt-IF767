@@ -26,7 +26,7 @@ void print_helper(){
     print_option("-a, --algorithm ALG:","Especifica o algoritmo");
     print_option("","que deve ser utilizado para o array de sufixos.");
 
-    string op = "skew, sort";
+    string op = "DC3, sort";
     char f_temp[500];
     sprintf(f_temp,"ALG pode ser: {%s}\n",op.c_str());
     print_option("",f_temp);
@@ -53,7 +53,7 @@ void init_args(Args& args){
     args.alg = -1;
 }
 int get_alg_id(char* alg){
-    return strcmp(alg,"sort") == 0? ALG_SORT : ALG_SKEW;
+    return strcmp(alg,"sort") == 0? ALG_SORT : ALG_DC3;
 }
 void read_patt_file(Args& ipmt){
     FILE *file;
@@ -91,7 +91,7 @@ Args parse_commands(int argc,char *argv[]){
             switch(opt){
                 case 'a':
                     ipmt.alg = get_alg_id(optarg);
-                    if(ipmt.alg != ALG_SORT and ipmt.alg != ALG_SKEW and ipmt.alg != -1){
+                    if(ipmt.alg != ALG_SORT and ipmt.alg != ALG_DC3 and ipmt.alg != -1){
                         ipmt.failed = true;
                         printf("Algoritmo inválido.\n");
                     }

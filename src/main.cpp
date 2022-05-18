@@ -12,7 +12,8 @@ int main(int argc,char *argv[]){
 
     // Se houve alguma falha na etapa anterior, o programa fecha
     if(ipmt.failed or ipmt.only_help) exit(1);
-    switch (ipmt.type){
+    
+    switch (ipmt.type){ // Chama a função responsável pelo tipo informado no parsing
     case INDEX:
         index(ipmt);
         break;

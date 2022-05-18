@@ -31,7 +31,7 @@ void counting_sort(int* indexes, int* sorted, int* text, int text_size, int alph
 // Encontra o suffix array de text[0..text_size - 1].
 // text[text_size] = text[text_size+1] = text[text_size+2] = 0, len(text) >= 2
 
-void skew_sa(int* text, int* SA, int text_size, int alpha_size) {
+void DC3_sa(int* text, int* SA, int text_size, int alpha_size) {
 	if(text_size == 1){
 		SA[0] = 0;
 		return;
@@ -72,7 +72,7 @@ void skew_sa(int* text, int* SA, int text_size, int alpha_size) {
 	}
 	
 	if (name < n02) {				
-		skew_sa(s12, SA12, n02, name);	    // Se os nomes ainda não forem únicos, gera o array de sufixos SA12
+		DC3_sa(s12, SA12, n02, name);	    // Se os nomes ainda não forem únicos, gera o array de sufixos SA12
 		for(int i = 0; i < n02; i++){		// Salva os nomes atualizados das tuplas em s12, para ordenação
 			s12[SA12[i]] = i + 1;
 		}

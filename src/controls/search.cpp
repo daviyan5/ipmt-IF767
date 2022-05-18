@@ -16,6 +16,7 @@ void default_colour(){
     printf("\x1b[0m");
 }
 
+// Carrega o arquivo de índice e o arquivo de texto, se possível
 void load_index(int* &SA, int* counts, char* index_name,char* &text, int &text_size, int &saved_text){
     FILE* index_file = fopen(index_name, "rb");
     if(!index_file){
@@ -48,6 +49,7 @@ void load_index(int* &SA, int* counts, char* index_name,char* &text, int &text_s
     }
     fclose(index_file);
 }
+// Reconstroi o texto a partir da contagem de caracteres e do array de sufixos
 void rebuild_text(char *text, int *SA, int *counts){
     int pont = 0;
     for(int i = 0; i < alpha_size; i++){
@@ -57,6 +59,7 @@ void rebuild_text(char *text, int *SA, int *counts){
         }
     }
 }
+// Printa as ocorrências no texto até a última linha em que aparece
 void print_occ_mul(char *text, int total_occ, int text_size, int num_patt, int **occ, 
                  vector<int> &patt_size, vector<int> &num_occ)
 {
@@ -64,6 +67,7 @@ void print_occ_mul(char *text, int total_occ, int text_size, int num_patt, int *
     printf("-----Total de Ocorrências: %d-----\n",total_occ);
     default_colour();
     if(total_occ == 0) return;
+    // Calcula as posições que devem ser pintadas, e onde o programa deve parar
     bool *paint = (bool*) calloc(text_size,sizeof(bool));
     int lim = 0;
     for(int j = 0; j < num_patt; j++){
@@ -77,6 +81,7 @@ void print_occ_mul(char *text, int total_occ, int text_size, int num_patt, int *
         
     }
     while(lim < text_size and text[lim] != '\n') lim++;
+    // Printa o texto até o limite
     for(int i = 0; i < lim; i++){
         if(paint[i]) red();
         else default_colour();
@@ -101,6 +106,7 @@ void search(Args &ipmt){
     int *SA, *counts = (int*) calloc(alpha_size,sizeof(int));
     char *index_name = (char*)malloc(sizeof(char)*(ipmt.index_file.size() + 5));
 
+    // Carrega o suffix array. Se houver texto no arquivo de índice, carrega o texto, senão, reconstroi.
     strcpy(index_name, ipmt.index_file.c_str());
     char *text;
     int saved_text = 0;
@@ -111,8 +117,9 @@ void search(Args &ipmt){
     vector<int> num_occs;
     int total_occ = 0;
     auto end = chrono::high_resolution_clock::now();
-    int dur = chrono::duration_cast<chrono::milliseconds>(end-start).count();
-    printf("\n-----Index loaded in %d ms-----\n",dur);
+    double dur = chrono::duration_cast<chrono::microseconds>(end-start).count();
+    printf("\n-----Index loaded in %lf ms-----\n",dur/1000);
+    // Busca cada um dos padrões no arquivo de texto
     for(int i = 0; i < ipmt.num_patt; i++){
         occ[i] = nullptr;
         int num_occ = sa_search(text,text_size,ipmt.patterns[i],ipmt.patt_size[i],SA,occ[i],ipmt.only_count);
@@ -123,6 +130,7 @@ void search(Args &ipmt){
         total_occ += num_occ;
         if(ipmt.per_pattern) printf("%s in %s: %d\n",ipmt.patterns[i],index_name, num_occ);
         if(!ipmt.only_count){
+            // Ordena as ocorrências para que sejam printadas em ordem
             qsort(occ[i],num_occ,sizeof(int),compare_int);
             num_occs.push_back(num_occ);
         }
