@@ -33,7 +33,7 @@ void build_fsm(string &pat, int m, map<pair<int, char>, int>& fsm){
     }
 }
  
-void prefix_match(string &txt, string &pat, int &p, int &l){    // n = len(txt), m = len(pat)
+void prefix_match(string &txt, string &pat, int &p, int &l, char &c){    // n = len(txt), m = len(pat)
     int n = txt.length();
     int m = pat.length() - 1;
 
@@ -52,6 +52,8 @@ void prefix_match(string &txt, string &pat, int &p, int &l){    // n = len(txt),
  
         i++;
     }
+
+    c = pat[l];
 }
 
 void encode(char *txt, int sz, char *zip_name){
@@ -70,9 +72,10 @@ void encode(char *txt, int sz, char *zip_name){
     file.open(zip_name);
 
     while(m > 0){
+        char c = '\\';
         int p = 0, l = 0;
-        prefix_match(searchBuffer, lookAheadBuffer, p, l);
-        char c = lookAheadBuffer[l];
+        prefix_match(searchBuffer, lookAheadBuffer, p, l, c);
+        if(c == '\\') break;
     
         file.write(reinterpret_cast<const char *>(&p), bufferBytes);
         file.write(reinterpret_cast<const char *>(&l), lookAheadBytes);
@@ -80,6 +83,7 @@ void encode(char *txt, int sz, char *zip_name){
 
         int sbsize = searchBuffer.length();
         int lasize = lookAheadBuffer.length();
+
         for (int i = l + 1; i < sbsize; i++){
             searchBuffer[i - l - 1] = searchBuffer[i];
             searchBuffer[i] = lookAheadBuffer[i - l - 1];
@@ -96,6 +100,7 @@ void encode(char *txt, int sz, char *zip_name){
 
         m = lookAheadBuffer.length();
     }
+
     file.close();
 }
 
@@ -119,11 +124,15 @@ void decode(char *zip_name, string &txt){
 
         txt += prefix + c;
 
-        string aux = "";
-        for(int i = l + 1; i < sbuf.length(); i++) aux += sbuf[i];
-        aux += prefix + c;
+        int j = 0, pl = prefix.length();
+        for(int i = l + 1; i < sbuf.length(); i++, j++) sbuf[j] = sbuf[i];
+         
+        for(int i = 0; i < pl; i++) {
+            sbuf[j] = prefix[i];
+            j++;
+        }
 
-        sbuf = aux;
+        sbuf[j] = c;
     }
 
     file.close();
