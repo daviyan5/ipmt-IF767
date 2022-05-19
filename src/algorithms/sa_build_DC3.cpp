@@ -3,27 +3,28 @@ using namespace std;
 
 // Funções para comparação de tuplas em ordem lexicográfica.
 
+//ti, R[Si+1]
 bool cmp_dupla(int a1, int a2, int b1, int b2){ 
 	return(a1 < b1 or a1 == b1 and a2 <= b2); 
-} 
+}
+// ti, t+1, R[Si+2]
 bool cmp_tripla(int a1, int a2, int a3, int b1, int b2, int b3){
 	return(a1 < b1 or a1 == b1 and cmp_dupla(a2,a3, b2,b3)); 
 } 
 
 // Um passo do Counting Sort para ordenar os índices "indexes" do array.
 void counting_sort(int* indexes, int* sorted, int* text, int text_size, int alpha_size){
-	int* count = (int*) calloc(alpha_size + 1,sizeof(int)); 									
-	for (int i = 0; i <= alpha_size; i++) count[i] = 0; 						
-	for (int i = 0; i < text_size; i++) count[text[indexes[i]]] += 1; 					
-	
-	for (int i = 0, sum = 0; i <= alpha_size; i++){ 						
-		int t = count[i]; 
-		count[i] = sum; 
-		sum += t; 
+	int* count = (int*) calloc(alpha_size + 1,sizeof(int));				
+	for (int i = 0; i < text_size; i++) count[text[indexes[i]]]++;
+	int sum = 0;
+	for (int i = 0; i <= alpha_size; i++){ 		// Soma de prefixo shiftada					
+		int temp = count[i];
+		count[i] = sum;
+		sum += temp;
 	}
 	for (int i = 0; i < text_size; i++){
 		sorted[count[text[indexes[i]]]] = indexes[i]; 							
-		count[text[indexes[i]]] += 1;
+		count[text[indexes[i]]]++;
 	}
 	free(count);
 }
@@ -39,29 +40,31 @@ void DC3_sa(int* text, int* SA, int text_size, int alpha_size) {
 	int n0 = (text_size+2)/3, n1 = (text_size+1)/3, n2 = text_size/3;
     int n02 = n0 + n2;
 	
-	int* s12 = (int*) calloc(n02 + 3, sizeof(int));                 // Array com concatenação de s1 e s2.
+	int* s12 = (int*) calloc(n02 + 3, sizeof(int));                 // Array com concatenação de s1 e s2. (Ranks de 1 e 2)
 	int* SA12 = (int*) calloc(n02 + 3, sizeof(int));                // Array de sufixos para s12.
 
-	int* s0 = (int*) calloc(n0, sizeof(int));                       // Array com as posições divisíveis por 3
+	int* s0 = (int*) calloc(n0, sizeof(int));                       // Array com as posições divisíveis por 3 (Ranks de 0)
 	int* SA0 = (int*) calloc(n0, sizeof(int));                      // Array de sufixos para s0.
 
 	// Gerando array com as posições não divisíveis por 3
-	for (int i = 0, j = 0; i < text_size + (n0-n1); i++){
+	int pont = 0;
+	int dum = text_size % 3 == 1? 1 : 0;
+	for (int i = 1; i < text_size + dum; i++){
 		if(i%3 != 0){
-			s12[j] = i;
-			j += 1;
+			s12[pont] = i;
+			pont++;
 		}
 	}
 	
-	// Ordenando SA12
+	// Ordenando as triplas de s12
 	counting_sort(s12 , SA12, text+2, n02, alpha_size);
 	counting_sort(SA12, s12 , text+1, n02, alpha_size);
 	counting_sort(s12 , SA12, text , n02, alpha_size);
 
-	// Gerando um nome para as triplas do array s12
+	// Gerando um nome para as triplas de s12
 	int name = 0, c0 = -1, c1 = -1, c2 = -1;
 	for (int i = 0; i < n02; i++) {
-		if(text[SA12[i]] != c0 or text[SA12[i]+1] != c1 or text[SA12[i]+2] != c2){  // Se o nome não for único
+		if(text[SA12[i]] != c0 or text[SA12[i]+1] != c1 or text[SA12[i]+2] != c2){  // Se o nome ainda não apareceu 
 			name += 1; 
 			c0 = text[SA12[i]]; 
 			c1 = text[SA12[i]+1]; 
@@ -72,8 +75,8 @@ void DC3_sa(int* text, int* SA, int text_size, int alpha_size) {
 	}
 	
 	if (name < n02) {				
-		DC3_sa(s12, SA12, n02, name);	    // Se os nomes ainda não forem únicos, gera o array de sufixos SA12
-		for(int i = 0; i < n02; i++){		// Salva os nomes atualizados das tuplas em s12, para ordenação
+		DC3_sa(s12, SA12, n02, name);	    // Se os nomes ainda não forem únicos, significa que s12 (rank) precisa ser ordenado.
+		for(int i = 0; i < n02; i++){		// Atualiza o rank de acordo com o array de sufixos calculado na recursão
 			s12[SA12[i]] = i + 1;
 		}
 	} 
@@ -82,11 +85,11 @@ void DC3_sa(int* text, int* SA, int text_size, int alpha_size) {
 			SA12[s12[i] - 1] = i;
 		}
 	}
-	
-	for (int i = 0, j = 0; i < n02; i++){	// Gerando array com as posições divisíveis por 3
+	pont = 0;
+	for (int i = 0; i < n02; i++){	// Gerando rank dos sufixos em posições divisíveis por 3
 		if(SA12[i] < n0){
-			s0[j] = 3*SA12[i];
-            j += 1;
+			s0[pont] = 3*SA12[i];
+            pont++;
 		}
 	}
 	counting_sort(s0, SA0, text, n0, alpha_size);	// Ordenando o array de sufixos de S0

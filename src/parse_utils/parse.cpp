@@ -30,6 +30,7 @@ void print_helper(){
     char f_temp[500];
     sprintf(f_temp,"ALG pode ser: {%s}\n",op.c_str());
     print_option("",f_temp);
+    print_option("","Obs: Textos com mais de 10^7 caracteres NÃO DEVEM ser processados com essa opção.");
     print_option("-s, --save:","Salva o texto no arquivo de index.");
     print_option("","Essa opção diminui consideravelmente o tempo de busca,");
     print_option("","mas pode aumentar o tamanho do arquivo de índice.");
